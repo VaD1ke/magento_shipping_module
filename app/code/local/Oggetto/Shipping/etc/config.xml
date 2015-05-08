@@ -35,6 +35,22 @@ please refer to http://www.magentocommerce.com for more information.
                 <class>Oggetto_Shipping_Model</class>
             </oggetto_shipping>
         </models>
+
+        <helpers>
+            <oggetto_shipping>
+                <class>Oggetto_Shipping_Helper</class>
+            </oggetto_shipping>
+        </helpers>
+
+        <resources>
+            <oggetto_shipping_setup>
+                <setup>
+                    <module>Oggetto_Shipping</module>
+                    <connection>core_setup</connection>
+                </setup>
+            </oggetto_shipping_setup>
+        </resources>
+
     </global>
 
     <default>
@@ -48,6 +64,8 @@ please refer to http://www.magentocommerce.com for more information.
             </oggetto_shipping>
         </carriers>
     </default>
+
+
 
     <phpunit>
         <suite>

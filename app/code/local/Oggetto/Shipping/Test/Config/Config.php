@@ -33,6 +33,16 @@
 class Oggetto_Shipping_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Config
 {
     /**
+     * Test setup resources on definition
+     *
+     * @return void
+     */
+    public function testChecksSetupResourcesDefined()
+    {
+        $this->assertSetupResourceDefined();
+    }
+
+    /**
      * Test codePool and version of module
      *
      * @return void
@@ -44,13 +54,14 @@ class Oggetto_Shipping_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Conf
     }
 
     /**
-     * Test class aliases for Model, Resource and Helper
+     * Test class aliases for Model and Helper
      *
      * @return void
      */
-    public function testChecksClassAliasForModelResourceAndHelper()
+    public function testChecksClassAliasForModelAndHelper()
     {
         $this->assertModelAlias('oggetto_shipping/carrier', 'Oggetto_Shipping_Model_Carrier');
+        $this->assertHelperAlias('oggetto_shipping/data', 'Oggetto_Shipping_Helper_Data');
     }
     
 }
