@@ -26,9 +26,6 @@ please refer to http://www.magentocommerce.com for more information.
         <Oggetto_Shipping>
             <active>true</active>
             <codePool>local</codePool>
-            <depends>
-                <Mage_Shipping />
-            </depends>
         </Oggetto_Shipping>
     </modules>
 </config>
