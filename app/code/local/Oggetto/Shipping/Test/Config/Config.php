@@ -42,5 +42,15 @@ class Oggetto_Shipping_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Conf
         $this->assertModuleCodePool('local', 'oggetto_shipping');
         $this->assertModuleVersion('0.1.0');
     }
+
+    /**
+     * Test class aliases for Model, Resource and Helper
+     *
+     * @return void
+     */
+    public function testChecksClassAliasForModelResourceAndHelper()
+    {
+        $this->assertModelAlias('oggetto_shipping/carrier', 'Oggetto_Shipping_Model_Carrier');
+    }
     
 }

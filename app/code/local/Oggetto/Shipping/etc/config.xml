@@ -29,6 +29,25 @@ please refer to http://www.magentocommerce.com for more information.
         </Oggetto_Shipping>
     </modules>
 
+    <global>
+        <models>
+            <oggetto_shipping>
+                <class>Oggetto_Shipping_Model</class>
+            </oggetto_shipping>
+        </models>
+    </global>
+
+    <default>
+        <carriers>
+            <oggetto_shipping>
+                <active>1</active>
+                <model>oggetto_shipping/carrier</model>
+                <title>Oggetto Shipping Carrier</title>
+                <sort_order>10</sort_order>
+                <sallowspecific>0</sallowspecific>
+            </oggetto_shipping>
+        </carriers>
+    </default>
 
     <phpunit>
         <suite>
