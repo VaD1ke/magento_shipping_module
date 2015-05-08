@@ -1,0 +1,2 @@
+config:
+  default/shipping/origin/country_id: test country
