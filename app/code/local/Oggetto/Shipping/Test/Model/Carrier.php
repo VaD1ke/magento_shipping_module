@@ -23,34 +23,54 @@
  */
 
 /**
- * Config test class for config.xml
+ * Carrier model test class
  *
  * @category   Oggetto
  * @package    Oggetto_Shipping
  * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Oggetto_Shipping_Test_Config_Config extends EcomDev_PHPUnit_Test_Case_Config
+class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Test codePool and version of module
+     * Model questions
+     *
+     * @var Oggetto_Shipping_Model_Carrier
+     */
+    protected $_modelCarrier = null;
+
+    /**
+     * Set up initial variables
      *
      * @return void
      */
-    public function testChecksModuleCodePoolAndVersion()
+    protected function setUp()
     {
-        $this->assertModuleCodePool('local', 'oggetto_shipping');
-        $this->assertModuleVersion('0.1.0');
+        parent::setUp();
+        $this->_modelCarrier = Mage::getModel('oggetto_shipping/carrier');
     }
 
     /**
-     * Test class aliases for Model, Resource and Helper
+     * Return shipping rate result model
      *
      * @return void
      */
-    public function testChecksClassAliasForModelResourceAndHelper()
+    public function testReturnsShippingRateResultModel()
     {
-        $this->assertModelAlias('oggetto_shipping/carrier', 'Oggetto_Shipping_Model_Carrier');
+        $modelRateResultMock = $this->getModelMock('shipping/rate_result', []);
+        $this->replaceByMock('model', 'shipping/rate_result', $modelRateResultMock);
+
+        $this->assertEquals($modelRateResultMock,
+            $this->_modelCarrier->collectRates(new Mage_Shipping_Model_Rate_Request));
     }
-    
+
+    /**
+     * Return allowed methods array
+     *
+     * @return void
+     */
+    public function testReturnsAllowedMethodsArray()
+    {
+        $this->assertEquals(['standard' => 'Standard'], $this->_modelCarrier->getAllowedMethods());
+    }
 }
