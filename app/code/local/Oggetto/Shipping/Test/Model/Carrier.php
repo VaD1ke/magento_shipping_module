@@ -51,17 +51,37 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
     }
 
     /**
+     * Return is active status from config
+     *
+     * @return void
+     *
+     * @loadFixture testReturnsIsActiveStatusFromConfig
+     */
+    public function testReturnsIsActiveStatusFromConfig()
+    {
+        $this->assertEquals(true, $this->_modelCarrier->isActive());
+    }
+
+    /**
+     * Return is not active status from config
+     *
+     * @return void
+     *
+     * @loadFixture
+     */
+    public function testReturnsIsNotActiveStatusFromConfig()
+    {
+        $this->assertEquals(false, $this->_modelCarrier->isActive());
+    }
+
+    /**
      * Return shipping rate result model
      *
      * @return void
      */
     public function testReturnsShippingRateResultModel()
     {
-        $modelRateResultMock = $this->getModelMock('shipping/rate_result', []);
-        $this->replaceByMock('model', 'shipping/rate_result', $modelRateResultMock);
 
-        $this->assertEquals($modelRateResultMock,
-            $this->_modelCarrier->collectRates(new Mage_Shipping_Model_Rate_Request));
     }
 
     /**
@@ -71,6 +91,6 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
      */
     public function testReturnsAllowedMethodsArray()
     {
-        $this->assertEquals(['standard' => 'Standard'], $this->_modelCarrier->getAllowedMethods());
+        $this->assertEquals($this->expected()->getData(), $this->_modelCarrier->getAllowedMethods());
     }
 }

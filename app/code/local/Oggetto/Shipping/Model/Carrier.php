@@ -41,6 +41,16 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
     protected $_code = 'oggetto_shipping';
 
     /**
+     * Returns active status from config
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getConfigFlag('active');
+    }
+
+    /**
      * Collect rates
      *
      * @param Mage_Shipping_Model_Rate_Request $request Request
@@ -48,17 +58,20 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      */
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-        return Mage::getModel('shipping/rate_result');
+
     }
 
     /**
-     * Get allowed methods
+     * Get allowed shipping methods
      *
      * @return array
      */
     public function getAllowedMethods()
     {
-        return ['standard' => 'Standard'];
+        return [
+            'standard' => 'Standard',
+            'fast'     => 'Fast'
+        ];
     }
 
 }
