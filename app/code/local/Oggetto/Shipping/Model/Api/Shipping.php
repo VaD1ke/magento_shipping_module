@@ -46,11 +46,19 @@ class Oggetto_Shipping_Model_Api_Shipping
     protected $_httpClient;
 
     /**
+     * Currency code of result price
+     *
+     * @var string
+     */
+    protected $_currency;
+
+    /**
      * Init object
      */
     public function __construct()
     {
         $this->_apiUrl = 'http://new.oggy.co/shipping/api/rest.php';
+        $this->_currency = 'RUB';
     }
 
     /**
@@ -62,10 +70,10 @@ class Oggetto_Shipping_Model_Api_Shipping
      */
     public function calculatePrices($origin, $destination)
     {
-        $this->_httpClient = new Varien_Http_Client($this->_apiUrl);
-        $this->_httpClient->resetParameters(true);
-
-        $this->_httpClient->setParameterGet([
+        /** @var Zend_Http_Client $client */
+        $client = $this->_getHttpClient();
+        $client->resetParameters(true);
+        $client->setParameterGet([
             'from_country' => $origin['country'],
             'from_region'  => $origin['region'],
             'from_city'    => $origin['city'],
@@ -74,16 +82,39 @@ class Oggetto_Shipping_Model_Api_Shipping
             'to_city'      => $destination['city']
         ]);
 
-        $response = $this->_httpClient->request(Varien_Http_Client::GET);
+        $response = $client->request(Varien_Http_Client::GET);
 
         if ($response->getStatus() == 200) {
-            if ($response['status'] == 'success') {
-                return $response['prices'];
+            $responseData = Mage::helper('core')->jsonDecode($response->getBody());
+
+            if ($responseData['status'] == 'success') {
+                return $responseData['prices'];
             } else {
-                return $response['message'];
+                return $responseData['message'];
             }
         }
 
         return [];
+    }
+
+    /**
+     * Get result price currency of oggetto shipping API
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->_currency;
+    }
+
+    /**
+     * Get http client with apiUrl and clear parameters
+     *
+     * @return Zend_Http_Client
+     */
+    protected function _getHttpClient()
+    {
+        $this->_httpClient = new Varien_Http_Client($this->_apiUrl);
+        return $this->_httpClient;
     }
 }
