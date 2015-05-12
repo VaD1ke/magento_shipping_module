@@ -1,0 +1,7 @@
+-
+  - country: fromcountry
+    region: fromregion
+    city: fromcity
+  - country: tocountry
+    region: toregion
+    city: tocity
