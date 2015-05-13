@@ -108,7 +108,7 @@ class Oggetto_Shipping_Model_Api_Shipping
     }
 
     /**
-     * Get http client with apiUrl and clear parameters
+     * Get http client with apiUrl
      *
      * @return Zend_Http_Client
      */
