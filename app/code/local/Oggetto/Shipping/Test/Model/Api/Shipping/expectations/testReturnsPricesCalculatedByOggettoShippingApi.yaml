@@ -1,11 +1,14 @@
 get_parameter: -
-    to_country: tocountry
-    to_region: toregion
-    to_city: tocity
-    from_country: fromcountry
-    from_region: fromregion
-    from_city: fromcity
+        to_country: tocountry
+        to_region: toregion
+        to_city: tocity
+        from_country: fromcountry
+        from_region: fromregion
+        from_city: fromcity
 
-calculated_prices: -
-    standard: 829
-    fast: 1053
+success:
+    result: -
+        standard: 829
+        fast: 1053
+error:
+    result: Invalid Data Format

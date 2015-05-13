@@ -1,9 +1,0 @@
-get_parameter: -
-    to_country: tocountry
-    to_region: toregion
-    to_city: tocity
-    from_country: fromcountry
-    from_region: fromregion
-    from_city: fromcity
-
-error_message: Invalid Data Format

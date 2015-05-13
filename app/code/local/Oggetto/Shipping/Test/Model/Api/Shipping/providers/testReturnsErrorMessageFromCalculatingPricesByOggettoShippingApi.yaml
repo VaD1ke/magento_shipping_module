@@ -1,8 +1,0 @@
--
-  - country: fromcountry
-    region: fromregion
-    city: fromcity
-  - country: tocountry
-    region: toregion
-    city: tocity
-  - '{"status":"error","message":"Invalid Data Format"}'

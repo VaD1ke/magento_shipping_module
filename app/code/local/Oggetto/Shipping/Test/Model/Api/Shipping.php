@@ -35,6 +35,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
     /**
      * Return prices calculated by oggetto shipping API
      *
+     * @param string $status       status of calculation
      * @param array  $orig         origin location
      * @param array  $dest         destination location
      * @param string $responseBody response body with prices
@@ -43,7 +44,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
      *
      * @dataProvider dataProvider
      */
-    public function testReturnsPricesCalculatedByOggettoShippingApi($orig, $dest, $responseBody)
+    public function testReturnsPricesCalculatedByOggettoShippingApi($status, $orig, $dest, $responseBody)
     {
         $httpResponseMock = $this->
                     _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(200, $responseBody);
@@ -55,40 +56,11 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
                     _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
 
         $this->assertEquals(
-            $this->expected()->getData()['calculated_prices'],
+            $this->expected($status)->getData()['result'],
             $apiMock->calculatePrices($orig, $dest)
         );
     }
 
-    /**
-     * Return error message when input data is invalid from calculating prices by oggetto shipping API
-     *
-     * @param array  $orig         origin location
-     * @param array  $dest         destination location
-     * @param string $responseBody response body with error
-     *
-     * @return void
-     *
-     * @dataProvider dataProvider
-     */
-    public function testReturnsErrorMessageFromCalculatingPricesByOggettoShippingApi($orig, $dest, $responseBody)
-    {
-        //var_dump($this->expected()->getData()['error_message']);die;
-
-        $httpResponseMock = $this->
-                    _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(200, $responseBody);
-
-        $httpClientMock = $this->
-                    _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock);
-
-        $apiMock = $this->
-                    _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
-
-        $this->assertEquals(
-            $this->expected()->getData()['error_message'],
-            $apiMock->calculatePrices($orig, $dest)
-        );
-    }
 
     /**
      * Return empty array when response is not 200(OK) from calculating prices by oggetto shipping API
