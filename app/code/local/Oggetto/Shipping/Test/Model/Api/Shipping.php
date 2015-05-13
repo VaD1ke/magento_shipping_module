@@ -65,8 +65,8 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
     /**
      * Return empty array when response is not 200(OK) from calculating prices by oggetto shipping API
      *
-     * @param array  $orig         origin location
-     * @param array  $dest         destination location
+     * @param array $orig origin location
+     * @param array $dest destination location
      *
      * @return void
      *
