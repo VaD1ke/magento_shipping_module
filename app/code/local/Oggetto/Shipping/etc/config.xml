@@ -58,13 +58,36 @@ please refer to http://www.magentocommerce.com for more information.
             <oggetto_shipping>
                 <active>1</active>
                 <model>oggetto_shipping/carrier</model>
-                <title>Oggetto Shipping Carrier</title>
+                <title>Oggetto Shipping</title>
                 <sort_order>10</sort_order>
                 <sallowspecific>0</sallowspecific>
             </oggetto_shipping>
         </carriers>
     </default>
 
+    <adminhtml>
+        <translate>
+            <modules>
+                <Oggetto_Shipping>
+                    <files>
+                        <default>Oggetto_Shipping.csv</default>
+                    </files>
+                </Oggetto_Shipping>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <frontend>
+        <translate>
+            <modules>
+                <Oggetto_Shipping>
+                    <files>
+                        <default>Oggetto_Shipping.csv</default>
+                    </files>
+                </Oggetto_Shipping>
+            </modules>
+        </translate>
+    </frontend>
 
 
     <phpunit>
