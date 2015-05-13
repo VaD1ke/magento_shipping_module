@@ -1,0 +1,17 @@
+from_country: -
+  country_name: fromcountry
+  region_name: fromregion
+
+to_country: -
+  country_name: tocountry
+  region_name: toregion
+
+carrier: oggetto_shipping
+
+methods: -
+  Standard: standard
+  Fast: fast
+
+prices: -
+  standard: 777
+  fast: 1111
