@@ -40,10 +40,6 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      */
     protected $_code = 'oggetto_shipping';
 
-    protected $_countryNames = [
-        'RU' => 'Россия',
-    ];
-
     /**
      * Returns active status from config
      *
@@ -179,7 +175,7 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      */
     protected function _getCountryNameById($countryId)
     {
-        return isset($this->_countryNames[$countryId]) ? $this->_countryNames[$countryId] : null;
+        return Mage::app()->getLocale()->getCountryTranslation($countryId);
     }
 
     /**
