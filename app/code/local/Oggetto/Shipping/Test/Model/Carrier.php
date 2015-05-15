@@ -98,10 +98,12 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
             'city'    => $providerDest['city']
         ];
 
-        $testCurrencyCode = 'RUB';
-        $testConfigTitle = 'Test Title';
+        $testCurrencyCode = $this->expected()->getCurrencyCode();
+        $testConfigTitle = $this->expected()->getConfigTitle();
+
         $methodsQuantity = count($this->expected()->getData()['methods']);
         $methodsNames = array_values($this->expected()->getData()['methods']);
+
         $prices = $this->expected('prices')->getData();
 
 
@@ -119,14 +121,17 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         ]);
 
         foreach (['country', 'region'] as $index => $location) {
+
             $modelCarrierMock->expects($this->at($index))
                 ->method('_get' . ucfirst($location) . 'NameById')
                 ->with($providerOrig[$location])
                 ->willReturn($originWithNames[$location]);
+
             $modelCarrierMock->expects($this->at($index + 2))
                 ->method('_get' . ucfirst($location) . 'NameById')
                 ->with($providerDest[$location])
                 ->willReturn($destinationWithNames[$location]);
+
         }
 
         $modelCarrierMock->expects($this->once())

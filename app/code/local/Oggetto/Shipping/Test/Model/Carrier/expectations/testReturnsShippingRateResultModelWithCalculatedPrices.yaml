@@ -15,3 +15,6 @@ methods: -
 prices: -
   standard: 777
   fast: 1111
+
+currency_code: RUB
+config_title: Test Title

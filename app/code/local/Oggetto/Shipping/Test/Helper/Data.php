@@ -27,7 +27,7 @@
  *
  * @category   Oggetto
  * @package    Oggetto_Shipping
- * @subpackage Helper
+ * @subpackage Test
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
 class Oggetto_Shipping_Test_Helper_Data extends EcomDev_PHPUnit_Test_Case
