@@ -25,7 +25,7 @@ please refer to http://www.magentocommerce.com for more information.
     <sections>
         <carriers translate="label" module="shipping">
             <groups>
-                <oggetto translate="label">
+                <oggetto_shipping translate="label">
                     <label>Oggetto Shipping</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>2</sort_order>
@@ -80,10 +80,9 @@ please refer to http://www.magentocommerce.com for more information.
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <can_be_empty>1</can_be_empty>
                         </specificcountry>
                     </fields>
-                </oggetto>
+                </oggetto_shipping>
             </groups>
         </carriers>
     </sections>

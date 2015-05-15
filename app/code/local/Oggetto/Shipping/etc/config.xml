@@ -60,7 +60,8 @@ please refer to http://www.magentocommerce.com for more information.
                 <model>oggetto_shipping/carrier</model>
                 <title>Oggetto Shipping</title>
                 <sort_order>10</sort_order>
-                <sallowspecific>0</sallowspecific>
+                <sallowspecific>1</sallowspecific>
+                <specificcountry>RU</specificcountry>
             </oggetto_shipping>
         </carriers>
     </default>
