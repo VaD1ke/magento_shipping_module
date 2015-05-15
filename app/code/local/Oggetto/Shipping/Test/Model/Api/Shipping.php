@@ -33,7 +33,7 @@
 class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
 {
     /**
-     * Return prices calculated by oggetto shipping API
+     * Return prices/error calculated by oggetto shipping API
      *
      * @param string $status       status of calculation
      * @param array  $orig         origin location
@@ -82,10 +82,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
 
         $apiMock = $this->_getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
 
-        $this->assertEquals(
-            [],
-            $apiMock->calculatePrices($orig, $dest)
-        );
+        $this->assertEquals([], $apiMock->calculatePrices($orig, $dest));
     }
 
     /**
@@ -96,7 +93,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
      *
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor($status, $body = null)
+    protected function _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor($status, $body = null)
     {
         $httpResponseMock = $this->getMockBuilder('Zend_Http_Response')
             ->disableOriginalConstructor()
@@ -126,7 +123,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
      *
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock)
+    protected function _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock)
     {
         $httpClientMock = $this->getMock('Varien_Http_Client', ['resetParameters', 'setParameterGet', 'request']);
 
@@ -153,7 +150,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
      *
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock)
+    protected function _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock)
     {
         $apiMock = $this->getModelMock('oggetto_shipping/api_shipping', ['_getHttpClient']);
 
