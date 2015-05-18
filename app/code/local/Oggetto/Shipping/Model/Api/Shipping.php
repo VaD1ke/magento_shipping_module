@@ -93,9 +93,9 @@ class Oggetto_Shipping_Model_Api_Shipping
 
             if ($responseData['status'] == 'success') {
                 return $responseData['prices'];
-            } else {
-                throw new Oggetto_Shipping_Model_Exceptions_CalculatePricesError('Wrong input data');
             }
+
+            throw new Oggetto_Shipping_Model_Exceptions_CalculatePricesError('Wrong input data');
         }
 
         throw new Oggetto_Shipping_Model_Exceptions_CalculatePricesError('Response status is not OK');

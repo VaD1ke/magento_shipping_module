@@ -66,9 +66,6 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
         } catch (Oggetto_Shipping_Model_Exceptions_CalculatePricesError $e) {
             return false;
         }
-        /*if (!is_array($prices) || $prices === []) {
-            return false;
-        }*/
 
         /** @var Mage_Directory_Model_Currency $currency */
         $currency = Mage::getModel('directory/currency');

@@ -50,29 +50,6 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         $this->_modelCarrier = Mage::getModel('oggetto_shipping/carrier');
     }
 
-    /**
-     * Return is active status from config
-     *
-     * @return void
-     *
-     * @loadFixture testReturnsIsActiveStatusFromConfig
-     */
-    public function testReturnsIsActiveStatusFromConfig()
-    {
-        $this->assertEquals(true, $this->_modelCarrier->isActive());
-    }
-
-    /**
-     * Return is not active status from config
-     *
-     * @return void
-     *
-     * @loadFixture
-     */
-    public function testReturnsIsNotActiveStatusFromConfig()
-    {
-        $this->assertEquals(false, $this->_modelCarrier->isActive());
-    }
 
     /**
      * Return shipping rate result model
@@ -202,6 +179,88 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
     }
 
     /**
+     * Return false in collectRates method with exception in calculated prices
+     *
+     * @param array $providerOrig original address
+     * @param array $providerDest destination address
+     *
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testReturnsFalseInCollectRatesMethodWithExceptionInCalculatedPrices($providerOrig, $providerDest)
+    {
+        $originWithNames = [
+            'country' => $this->expected('from_country')->getCountryName(),
+            'region'  => $this->expected('from_country')->getRegionName(),
+            'city'    => $providerOrig['city']
+        ];
+
+        $destinationWithNames = [
+            'country' => $this->expected('to_country')->getCountryName(),
+            'region'  => $this->expected('to_country')->getRegionName(),
+            'city'    => $providerDest['city']
+        ];
+
+
+        $request = $this->_getRequestWithEstablishedDestinationCountryRegionAndCity($providerDest);
+
+
+        $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', [
+            'isActive',
+            'getOriginAddress',
+            'getDestinationAddress',
+            '_getCurrentCurrencyCode'
+        ]);
+
+        $modelCarrierMock->expects($this->once())
+            ->method('isActive')
+            ->willReturn(true);
+
+        $modelCarrierMock->expects($this->once())
+            ->method('getOriginAddress')
+            ->willReturn($originWithNames);
+
+        $modelCarrierMock->expects($this->once())
+            ->method('getDestinationAddress')
+            ->with($request)
+            ->willReturn($destinationWithNames);
+
+        $modelCarrierMock->expects($this->never())
+            ->method('_getCurrentCurrencyCode');
+
+
+        $modelApiMock = $this->getModelMock('oggetto_shipping/api_shipping', ['calculatePrices']);
+
+        $modelApiMock->expects($this->once())
+            ->method('calculatePrices')
+            ->with($originWithNames, $destinationWithNames)
+            ->willThrowException(new Oggetto_Shipping_Model_Exceptions_CalculatePricesError);
+
+        $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
+        $this->replaceByMock('model', 'oggetto_shipping/api_shipping', $modelApiMock);
+
+        $this->assertFalse($modelCarrierMock->collectRates($request));
+    }
+
+    /**
+     * Return false in collectRates method when Oggetto Shipping Method is not active
+     *
+     * @return void
+     */
+    public function testReturnsFalseInCollectRatesMethodWhenOggettoShippingMethodIsNotActive()
+    {
+        $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', ['isActive']);
+
+        $modelCarrierMock->expects($this->once())
+            ->method('isActive');
+
+        $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
+
+        $this->assertFalse($modelCarrierMock->collectRates(new Mage_Shipping_Model_Rate_Request));
+    }
+
+    /**
      * Return origin address from config
      *
      * @param array $originAddress          origin address with country and region id
@@ -250,6 +309,7 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
     {
         $this->assertEquals($this->expected()->getData(), $this->_modelCarrier->getAllowedMethods());
     }
+
 
     /**
      * Get request with established destination country, region and city
