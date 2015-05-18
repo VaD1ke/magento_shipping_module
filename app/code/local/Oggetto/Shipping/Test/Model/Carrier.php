@@ -107,32 +107,30 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         $prices = $this->expected('prices')->getData();
 
 
+
         $request = $this->_getRequestWithEstablishedDestinationCountryRegionAndCity($providerDest);
 
 
-        $this->_mockOggettoShippingHelperDataForGettingOriginAddressFromStoreConfig($providerOrig);
-
-
         $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', [
+            'isActive',
             'getConfigData',
-            '_getCountryNameById',
-            '_getRegionNameById',
+            'getOriginAddress',
+            'getDestinationAddress',
             '_getCurrentCurrencyCode'
         ]);
 
-        foreach (['country', 'region'] as $index => $location) {
+        $modelCarrierMock->expects($this->once())
+            ->method('isActive')
+            ->willReturn(true);
 
-            $modelCarrierMock->expects($this->at($index))
-                ->method('_get' . ucfirst($location) . 'NameById')
-                ->with($providerOrig[$location])
-                ->willReturn($originWithNames[$location]);
+        $modelCarrierMock->expects($this->once())
+            ->method('getOriginAddress')
+            ->willReturn($originWithNames);
 
-            $modelCarrierMock->expects($this->at($index + 2))
-                ->method('_get' . ucfirst($location) . 'NameById')
-                ->with($providerDest[$location])
-                ->willReturn($destinationWithNames[$location]);
-
-        }
+        $modelCarrierMock->expects($this->once())
+            ->method('getDestinationAddress')
+            ->with($request)
+            ->willReturn($destinationWithNames);
 
         $modelCarrierMock->expects($this->once())
             ->method('_getCurrentCurrencyCode')
@@ -148,10 +146,10 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
             $originWithNames, $destinationWithNames, $prices, $testCurrencyCode
         );
 
-
         $this->_mockCurrencyModelForSettingCurrencyCode($testCurrencyCode);
 
-        $this->_mockDirectoryHelperMockForCurrencyConvertingCalculatedPrices($prices, $testCurrencyCode);
+        $this->_mockDirectoryHelperForCurrencyConvertingCalculatedPrices($prices, $testCurrencyCode);
+
 
         $modelRateMethodMock = $this->getModelMock('shipping/rate_result_method', [
             'setCarrier', 'setCarrierTitle',
@@ -204,6 +202,46 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
     }
 
     /**
+     * Return origin address from config
+     *
+     * @param array $originAddress          origin address with country and region id
+     * @param array $originAddressWithNames origin address with country and region names
+     *
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testReturnsOriginAddressFromConfig($originAddress, $originAddressWithNames)
+    {
+        $this->_mockOggettoShippingHelperDataForGettingOriginAddressFromStoreConfig($originAddress);
+
+        $modelCarrierMock = $this->
+                _getOggettoShippingCarrierMockForGettingCountryAndRegionNames($originAddress, $originAddressWithNames);
+
+        $this->assertEquals($originAddressWithNames, $modelCarrierMock->getOriginAddress($originAddress));
+    }
+
+    /**
+     * Return destination address from request
+     *
+     * @param array $destAddress          destination address with country and region id
+     * @param array $destAddressWithNames destination address with country and region names
+     *
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testReturnsDestinationAddressFromRequest($destAddress, $destAddressWithNames)
+    {
+        $request = $this->_getRequestWithEstablishedDestinationCountryRegionAndCity($destAddress);
+
+        $modelCarrierMock = $this->
+                _getOggettoShippingCarrierMockForGettingCountryAndRegionNames($destAddress, $destAddressWithNames);
+
+        $this->assertEquals($destAddressWithNames, $modelCarrierMock->getDestinationAddress($request));
+    }
+
+    /**
      * Return allowed methods array
      *
      * @return void
@@ -230,6 +268,34 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         return $request;
     }
 
+    /**
+     * Mock Oggetto Shipping Carrier Model for getting country and region names by id
+     *
+     * @param array $addressWithIds   address with region and country ids
+     * @param array $addressWithNames address with region and country names
+     *
+     * @return EcomDev_PHPUnit_Mock_Proxy
+     *
+     * @dataProvider dataProvider
+     */
+    protected function _getOggettoShippingCarrierMockForGettingCountryAndRegionNames($addressWithIds, $addressWithNames)
+    {
+        $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', [
+            '_getCountryNameById',
+            '_getRegionNameById'
+        ]);
+
+        foreach (['country', 'region'] as $index => $location) {
+            $modelCarrierMock->expects($this->at($index))
+                ->method('_get' . ucfirst($location) . 'NameById')
+                ->with($addressWithIds[$location])
+                ->willReturn($addressWithNames[$location]);
+        }
+
+        $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
+
+        return $modelCarrierMock;
+    }
 
     /**
      * Get Oggetto Shipping Helper Data Mock gor getting origin address from store config
@@ -313,7 +379,7 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
      * @param string $currencyCode currency code
      * @return void
      */
-    protected function _mockDirectoryHelperMockForCurrencyConvertingCalculatedPrices($prices, $currencyCode)
+    protected function _mockDirectoryHelperForCurrencyConvertingCalculatedPrices($prices, $currencyCode)
     {
         $helperDirectoryMock = $this->getHelperMock('directory', ['currencyConvert']);
 

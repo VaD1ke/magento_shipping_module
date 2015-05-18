@@ -40,15 +40,6 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      */
     protected $_code = 'oggetto_shipping';
 
-    /**
-     * Returns active status from config
-     *
-     * @return bool
-     */
-    public function isActive()
-    {
-        return $this->getConfigFlag('active');
-    }
 
     /**
      * Collect rates
@@ -62,16 +53,12 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
             return false;
         }
 
-        $origin = $this->_getOriginAddress();
-        $origin['country'] = $this->_getCountryNameById($origin['country']);
-        $origin['region'] = $this->_getRegionNameById($origin['region']);
+        $origin = $this->getOriginAddress();
 
-        $destination = $this->_getDestinationAddress($request);
-        $destination['country'] = $this->_getCountryNameById($destination['country']);
-        $destination['region'] = $this->_getRegionNameById($destination['region']);
+        $destination = $this->getDestinationAddress($request);
+
 
         /** @var Oggetto_Shipping_Model_Api_Shipping $shippingApi */
-
         $shippingApi = Mage::getModel('oggetto_shipping/api_shipping');
 
         $prices = $shippingApi->calculatePrices($origin, $destination);
@@ -117,11 +104,42 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
     }
 
     /**
+     * Get origin address
+     *
+     * @return array
+     */
+    public function getOriginAddress()
+    {
+        $origin = $this->_getOriginAddressFromConfig();
+        $origin['country'] = $this->_getCountryNameById($origin['country']);
+        $origin['region'] = $this->_getRegionNameById($origin['region']);
+
+        return $origin;
+    }
+
+    /**
+     * Get destination address
+     *
+     * @param Mage_Shipping_Model_Rate_Request $request Request
+     * @return array
+     */
+    public function getDestinationAddress(Mage_Shipping_Model_Rate_Request $request)
+    {
+        $destination = $this->_getDestinationAddressFromRequest($request);
+        $destination['country'] = $this->_getCountryNameById($destination['country']);
+        $destination['region'] = $this->_getRegionNameById($destination['region']);
+
+        return $destination;
+    }
+
+
+
+    /**
      * Get origin address array (country, region, city) from store config
      *
      * @return array
      */
-    protected function _getOriginAddress()
+    protected function _getOriginAddressFromConfig()
     {
         /** @var  Oggetto_Shipping_Helper_Data $helper */
         $helper = Mage::helper('oggetto_shipping');
@@ -141,7 +159,7 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      * @param Mage_Shipping_Model_Rate_Request $request Request
      * @return array
      */
-    protected function _getDestinationAddress(Mage_Shipping_Model_Rate_Request $request)
+    protected function _getDestinationAddressFromRequest(Mage_Shipping_Model_Rate_Request $request)
     {
         $destinationAddress = [
             'country' => $request->getDestCountryId(),
@@ -160,9 +178,10 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
      */
     protected function _getRegionNameById($regionId)
     {
-        $directoryModel = Mage::getModel('directory/region');
+        /** @var Mage_Directory_Model_Region $region */
+        $region = Mage::getModel('directory/region')->load($regionId);
 
-        $regionName = Mage::helper('oggetto_shipping')->__($directoryModel->load($regionId)->getDefaultName());
+        $regionName = Mage::helper('oggetto_shipping')->__($region->getName());
 
         return $regionName;
     }

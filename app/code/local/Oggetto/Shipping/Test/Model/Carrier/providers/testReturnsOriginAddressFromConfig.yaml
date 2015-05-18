@@ -1,0 +1,7 @@
+-
+  - country: Test
+    region: 777
+    city: fromcity
+  - country: testcountry
+    region: testreg
+    city: fromcity
