@@ -35,7 +35,6 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
     /**
      * Return prices/error calculated by oggetto shipping API
      *
-     * @param string $status       status of calculation
      * @param array  $orig         origin location
      * @param array  $dest         destination location
      * @param string $responseBody response body with prices
@@ -44,7 +43,7 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
      *
      * @dataProvider dataProvider
      */
-    public function testReturnsPricesCalculatedByOggettoShippingApi($status, $orig, $dest, $responseBody)
+    public function testReturnsPricesCalculatedByOggettoShippingApi($orig, $dest, $responseBody)
     {
         $httpResponseMock = $this->
                     _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(200, $responseBody);
@@ -56,33 +55,66 @@ class Oggetto_Shipping_Test_Model_Api_Shipping extends EcomDev_PHPUnit_Test_Case
                     _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
 
         $this->assertEquals(
-            $this->expected($status)->getData()['result'],
+            $this->expected()->getResult(),
             $apiMock->calculatePrices($orig, $dest)
         );
     }
 
+    /**
+     * Throw exception in calculating prices method in Oggetto Shipping API with error message status
+     *
+     * @param array  $orig         origin location
+     * @param array  $dest         destination location
+     * @param string $responseBody response body with prices
+     *
+     * @return void
+     * @throws Oggetto_Shipping_Model_Exceptions_CalculatePricesError
+     *
+     * @dataProvider dataProvider
+     */
+    public function testThrowsExceptionInCalculatingPricesShippingApiMethodWithErrorStatus($orig, $dest, $responseBody)
+    {
+        $httpResponseMock = $this->
+                    _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(200, $responseBody);
+
+        $httpClientMock = $this->
+                    _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock);
+
+        $apiMock = $this->
+                    _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
+
+        $this->setExpectedException('Oggetto_Shipping_Model_Exceptions_CalculatePricesError', 'Wrong input data');
+
+        $apiMock->calculatePrices($orig, $dest);
+    }
 
     /**
-     * Return empty array when response is not 200(OK) from calculating prices by oggetto shipping API
+     * Throw exception when response is not 200(OK) from calculating prices by oggetto shipping API
      *
      * @param array $orig origin location
      * @param array $dest destination location
      *
      * @return void
+     * @throws Oggetto_Shipping_Model_Exceptions_CalculatePricesError
      *
      * @dataProvider dataProvider
      */
-    public function testReturnsEmptyArrayFromCalculatingPricesByOggettoShippingApi($orig, $dest)
+    public function testThrowsExceptionInCalculatingPricesShippingApiMethodWithNotOkResponseStatus($orig, $dest)
     {
         $httpResponseMock = $this->
-                _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(777);
+        _getHttpResponseMockWithGetStatusAndBodyMethodsAndDisabledConstructor(777);
 
         $httpClientMock = $this->
-                _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock);
+        _getHttpClientMockWithResetAndSetParametersMethodsAndRequest($httpResponseMock);
 
-        $apiMock = $this->_getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
+        $apiMock = $this->
+        _getOggettoShippingApiMockWithProtectedGetHttpClientMethodAndReplaceIt($httpClientMock);
 
-        $this->assertEquals([], $apiMock->calculatePrices($orig, $dest));
+        $this->setExpectedException(
+            'Oggetto_Shipping_Model_Exceptions_CalculatePricesError', 'Response status is not OK'
+        );
+
+        $apiMock->calculatePrices($orig, $dest);
     }
 
     /**

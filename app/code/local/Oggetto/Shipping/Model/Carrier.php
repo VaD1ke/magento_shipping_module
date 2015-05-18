@@ -61,11 +61,14 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
         /** @var Oggetto_Shipping_Model_Api_Shipping $shippingApi */
         $shippingApi = Mage::getModel('oggetto_shipping/api_shipping');
 
-        $prices = $shippingApi->calculatePrices($origin, $destination);
-
-        if (!is_array($prices) || $prices === []) {
+        try {
+            $prices = $shippingApi->calculatePrices($origin, $destination);
+        } catch (Oggetto_Shipping_Model_Exceptions_CalculatePricesError $e) {
             return false;
         }
+        /*if (!is_array($prices) || $prices === []) {
+            return false;
+        }*/
 
         /** @var Mage_Directory_Model_Currency $currency */
         $currency = Mage::getModel('directory/currency');

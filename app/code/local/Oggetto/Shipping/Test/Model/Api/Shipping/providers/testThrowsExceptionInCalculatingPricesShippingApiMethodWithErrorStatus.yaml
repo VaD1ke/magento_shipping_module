@@ -5,4 +5,4 @@
   - country: tocountry
     region: toregion
     city: tocity
-  - '{"status":"success","prices":{"standard":829,"fast":1053}}'
+  - '{"status":"error","message":"Invalid Data Format"}'

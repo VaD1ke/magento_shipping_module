@@ -6,9 +6,6 @@ get_parameter: -
         from_region: fromregion
         from_city: fromcity
 
-success:
-    result: -
-        standard: 829
-        fast: 1053
-error:
-    result: Invalid Data Format
+result: -
+    standard: 829
+    fast: 1053

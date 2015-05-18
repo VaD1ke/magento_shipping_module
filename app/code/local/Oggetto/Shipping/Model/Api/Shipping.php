@@ -66,7 +66,11 @@ class Oggetto_Shipping_Model_Api_Shipping
      *
      * @param array $origin      Origin
      * @param array $destination Destination
-     * @return string|array
+     *
+     * @return array
+     *
+     * @throws Oggetto_Shipping_Model_Exceptions_CalculatePricesError
+     * @throws Zend_Http_Client_Exception
      */
     public function calculatePrices($origin, $destination)
     {
@@ -90,11 +94,11 @@ class Oggetto_Shipping_Model_Api_Shipping
             if ($responseData['status'] == 'success') {
                 return $responseData['prices'];
             } else {
-                return $responseData['message'];
+                throw new Oggetto_Shipping_Model_Exceptions_CalculatePricesError('Wrong input data');
             }
         }
 
-        return [];
+        throw new Oggetto_Shipping_Model_Exceptions_CalculatePricesError('Response status is not OK');
     }
 
     /**
