@@ -76,13 +76,13 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         ];
 
         $testCurrencyCode = $this->expected()->getCurrencyCode();
-        $testConfigTitle = $this->expected()->getConfigTitle();
 
         $methodsQuantity = count($this->expected()->getData()['methods']);
         $methodsNames = array_values($this->expected()->getData()['methods']);
 
         $prices = $this->expected('prices')->getData();
 
+        $rateResultMethod = new Mage_Shipping_Model_Rate_Result_Method;
 
 
         $request = $this->_getRequestWithEstablishedDestinationCountryRegionAndCity($providerDest);
@@ -91,6 +91,7 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', [
             'isActive',
             'getConfigData',
+            'getRateMethod',
             'getOriginAddress',
             'getDestinationAddress',
             '_getCurrentCurrencyCode'
@@ -113,64 +114,27 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
             ->method('_getCurrentCurrencyCode')
             ->willReturn($testCurrencyCode);
 
-        $modelCarrierMock->expects($this->exactly($methodsQuantity))
-            ->method('getConfigData')
-            ->with('title')
-            ->willReturn($testConfigTitle);
+        foreach ($methodsNames as $index => $methodName) {
+            $modelCarrierMock->expects($this->at($index + 4))
+                ->method('getRateMethod')
+                ->with($methodName, $prices[$methodName])
+                ->willReturn($rateResultMethod);
+        }
 
 
         $this->_mockOggettoShippingApiModelForCalculatingPricesAndGetCurrency(
             $originWithNames, $destinationWithNames, $prices, $testCurrencyCode
         );
 
-        $this->_mockCurrencyModelForSettingCurrencyCode($testCurrencyCode);
-
         $this->_mockDirectoryHelperForCurrencyConvertingCalculatedPrices($prices, $testCurrencyCode);
-
-
-        $modelRateMethodMock = $this->getModelMock('shipping/rate_result_method', [
-            'setCarrier', 'setCarrierTitle',
-            'setMethod',  'setMethodTitle',
-            'setPrice',   'setCost'
-        ]);
-
-        $modelRateMethodMock->expects($this->exactly($methodsQuantity))
-            ->method('setCarrier')
-            ->with($this->expected()->getData()['carrier']);
-
-        $modelRateMethodMock->expects($this->exactly($methodsQuantity))
-            ->method('setCarrierTitle')
-            ->with($testConfigTitle);
-
-        $i = 2;
-        foreach ($methodsNames as $methodName) {
-            $modelRateMethodMock->expects($this->at($i++))
-                ->method('setMethod')
-                ->with($methodName);
-
-            $modelRateMethodMock->expects($this->at($i++))
-                ->method('setMethodTitle')
-                ->with(ucfirst($methodName));
-
-            $modelRateMethodMock->expects($this->at($i++))
-                ->method('setPrice')
-                ->with($prices[$methodName]);
-
-            $modelRateMethodMock->expects($this->at($i++))
-                ->method('setCost')
-                ->with($prices[$methodName]);
-            $i += 2;
-        }
 
 
         $modelRateMock = $this->getModelMock('shipping/rate_result', ['append']);
 
         $modelRateMock->expects($this->exactly($methodsQuantity))
-            ->method('append')
-            ->with($modelRateMethodMock);
+            ->method('append');
 
 
-        $this->replaceByMock('model', 'shipping/rate_result_method', $modelRateMethodMock);
         $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
         $this->replaceByMock('model', 'shipping/rate_result', $modelRateMock);
 
@@ -258,6 +222,63 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
         $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
 
         $this->assertFalse($modelCarrierMock->collectRates(new Mage_Shipping_Model_Rate_Request));
+    }
+
+    /**
+     * Return rate method with established params for collect rates method
+     *
+     * @return void
+     */
+    public function testReturnsRateMethodWithEstablishedParamsForCollectRatesMethod()
+    {
+        $carrier = $this->expected()->getCarrier();
+        $configTitle = $this->expected()->getConfigTitle();
+        $method = $this->expected()->getMethodName();
+        $price = $this->expected()->getPrice();
+
+        $modelCarrierMock = $this->getModelMock('oggetto_shipping/carrier', ['getConfigData']);
+
+        $modelCarrierMock->expects($this->once())
+            ->method('getConfigData')
+            ->with('title')
+            ->willReturn($configTitle);
+
+        $this->replaceByMock('model', 'oggetto_shipping/carrier', $modelCarrierMock);
+
+
+        $modelRateMethodMock = $this->getModelMock('shipping/rate_result_method', [
+            'setCarrier', 'setCarrierTitle',
+            'setMethod',  'setMethodTitle',
+            'setPrice',   'setCost'
+        ]);
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setCarrier')
+            ->with($carrier);
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setCarrierTitle')
+            ->with($configTitle);
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setMethod')
+            ->with($method);
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setMethodTitle')
+            ->with(ucfirst($method));
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setPrice')
+            ->with($price);
+
+        $modelRateMethodMock->expects($this->once())
+            ->method('setCost')
+            ->with($price);
+
+        $this->replaceByMock('model', 'shipping/rate_result_method', $modelRateMethodMock);
+
+        $this->assertEquals($modelRateMethodMock, $modelCarrierMock->getRateMethod($method, $price));
     }
 
     /**
@@ -413,23 +434,6 @@ class Oggetto_Shipping_Test_Model_Carrier extends EcomDev_PHPUnit_Test_Case
 
 
         $this->replaceByMock('model', 'oggetto_shipping/api_shipping', $modelApiMock);
-    }
-
-    /**
-     * Mock Currency Model for setting currency code
-     *
-     * @param string $currencyCode currency code
-     * @return void
-     */
-    protected function _mockCurrencyModelForSettingCurrencyCode($currencyCode)
-    {
-        $modelCurrencyMock = $this->getModelMock('directory/currency', ['setData']);
-
-        $modelCurrencyMock->expects($this->once())
-            ->method('setData')
-            ->with(['currency_code' => $currencyCode]);
-
-        $this->replaceByMock('model', 'directory/currency', $modelCurrencyMock);
     }
 
     /**

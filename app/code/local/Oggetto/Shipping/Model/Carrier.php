@@ -53,10 +53,8 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
             return false;
         }
 
-        $origin = $this->getOriginAddress();
-
+        $origin      = $this->getOriginAddress();
         $destination = $this->getDestinationAddress($request);
-
 
         /** @var Oggetto_Shipping_Model_Api_Shipping $shippingApi */
         $shippingApi = Mage::getModel('oggetto_shipping/api_shipping');
@@ -67,11 +65,9 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
             return false;
         }
 
-        /** @var Mage_Directory_Model_Currency $currency */
-        $currency = Mage::getModel('directory/currency');
+
         $currentCurrencyCode = $this->_getCurrentCurrencyCode();
-        $currency->setData(['currency_code' => $currentCurrencyCode]);
-        $apiCurrencyCode = $shippingApi->getCurrency();
+        $apiCurrencyCode     = $shippingApi->getCurrency();
 
         /** @var Mage_Shipping_Model_Rate_Result $rateResult */
         $rateResult = Mage::getModel('shipping/rate_result');
@@ -83,7 +79,9 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
 
             $price = $this->_reduceAndRoundPrice($price, $apiCurrencyCode, $currentCurrencyCode);
 
-            $rateResult->append($this->_getRateMethod($method, $price));
+            $rateResultMethod = $this->getRateMethod($method, $price);
+
+            $rateResult->append($rateResultMethod);
         }
 
         return $rateResult;
@@ -132,6 +130,29 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
         return $destination;
     }
 
+    /**
+     * Get rate method
+     *
+     * @param string $method shipping method
+     * @param float  $price  price for shipping
+     *
+     * @return Mage_Shipping_Model_Rate_Result_Method
+     */
+    public function getRateMethod($method, $price)
+    {
+        /** @var Mage_Shipping_Model_Rate_Result_Method $rateMethod */
+        $rateMethod = Mage::getModel('shipping/rate_result_method');
+
+        $rateMethod->setCarrier($this->_code);
+        $rateMethod->setCarrierTitle($this->getConfigData('title'));
+        $rateMethod->setMethod($method);
+        $rateMethod->setMethodTitle(ucfirst($method));
+
+        $rateMethod->setPrice($price);
+        $rateMethod->setCost($price);
+
+        return $rateMethod;
+    }
 
 
     /**
@@ -205,30 +226,6 @@ class Oggetto_Shipping_Model_Carrier extends Mage_Shipping_Model_Carrier_Abstrac
     protected function _getCurrentCurrencyCode()
     {
         return Mage::app()->getStore()->getCurrentCurrencyCode();
-    }
-
-    /**
-     * Get rate method
-     *
-     * @param string $method shipping method
-     * @param float  $price  price for shipping
-     *
-     * @return Mage_Shipping_Model_Rate_Result_Method
-     */
-    protected function _getRateMethod($method, $price)
-    {
-        /** @var Mage_Shipping_Model_Rate_Result_Method $rateMethod */
-        $rateMethod = Mage::getModel('shipping/rate_result_method');
-
-        $rateMethod->setCarrier($this->_code);
-        $rateMethod->setCarrierTitle($this->getConfigData('title'));
-        $rateMethod->setMethod($method);
-        $rateMethod->setMethodTitle(ucfirst($method));
-
-        $rateMethod->setPrice($price);
-        $rateMethod->setCost($price);
-
-        return $rateMethod;
     }
 
     /**
